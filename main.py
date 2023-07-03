@@ -15,9 +15,7 @@ storage = None
 def get_storage():
 	global storage
 	if not storage:
-		bucket_name = os.environ.get('BUCKET_NAME')
-		if not bucket_name:
-			bucket_name = app_identity.get_default_gcs_bucket_name()
+		bucket_name = os.environ.get('BUCKET_NAME') or app_identity.get_default_gcs_bucket_name()
 		storage = GCStorage(bucket_name)
 	return storage
 
@@ -55,11 +53,11 @@ def root_post():
 @app.route("/packages", methods=['GET'])
 @basic_auth()
 def packages_get():
-	storage = get_storage()
-	if storage.empty():
+	st = get_storage()
+	if st.empty():
 		return 'Nothing to see here yet, try uploading a package!'
 	else:
-		return storage.to_html(full_index=False)
+		return st.to_html(full_index=False)
 
 
 @app.route("/packages/<package>", methods=['GET'])
@@ -88,16 +86,16 @@ def package_download(name, version, filename):
 		package = Package(get_storage(), name, version)
 		gcs_file = package.get_file(filename)
 		return send_file(gcs_file, mimetype='application/octet-stream', as_attachment=True, download_name=filename)
-	except NotFound:
+	except (NotFound, GAEPyPIError):
 		abort(404)
 
 
 @app.route("/pypi/package/<path:package>", methods=['GET'])
 @basic_auth()
 def pypi_package_get(package):
-	storage = get_storage()
-	index = PackageIndex(storage, package)
-	if not index.empty() and index.exists(storage):
+	st = get_storage()
+	index = PackageIndex(st, package)
+	if not index.empty() and index.exists(st):
 		return index.to_html(full_index=True)
 	abort(404)
 

@@ -16,6 +16,7 @@
 
 import json
 import hashlib
+import functools
 from flask import Flask, Response, request
 
 
@@ -49,6 +50,7 @@ def valid_credentials(username, password, required_roles=None):
 
 def basic_auth(required_roles=None):
 	def inner_decorator(f):
+		@functools.wraps(f)
 		def wrapped(*args, **kwargs):
 			auth = request.authorization
 			if not auth or not auth.username or not auth.password:
@@ -56,7 +58,6 @@ def basic_auth(required_roles=None):
 			if not valid_credentials(auth.username, auth.password, required_roles):
 				return Response('Forbidden', 403)
 			return f(*args, **kwargs)
-		wrapped.__name__ = f.__name__
 		return wrapped
 	return inner_decorator
 
