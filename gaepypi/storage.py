@@ -22,6 +22,7 @@ import six
 from abc import ABCMeta, abstractmethod
 from google.cloud import storage
 from io import BytesIO
+import os
 
 storage_client = storage.Client()
 
@@ -126,11 +127,11 @@ class GCStorage(Storage):
         return '/{0}/packages'.format(self.bucket)
 
     def get_package_path(self, package, version=None, filename=None):
-        path = '{0}/{1}'.format(self.get_packages_path(), package)
+        path = os.path.join(self.get_packages_path(), package)
         if version:
-            path = '{0}/{1}'.format(path, version)
+            path = os.path.join(path, version)
             if filename:
-                path = '{0}/{1}'.format(path, filename)
+                path = os.path.join(path, filename)
         return path
 
     def split_path(self, path):
@@ -185,4 +186,4 @@ class GCStorage(Storage):
         ret = {}
         for blob in blobs:
             ret.add(blob.name)
-        return bucket_path in ret or (bucket_path + '/') in blobs.prefixes
+        return bucket_path in ret or len(blobs.prefixes)

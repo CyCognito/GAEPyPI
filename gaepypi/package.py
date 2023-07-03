@@ -49,7 +49,7 @@ class Package(BucketObject):
 
         files = []
         path = storage.get_package_path(name.lower(), version)
-        for f in storage.ls(path+'/'):
+        for f in storage.ls(path):
             files.append(storage.split_path(f)['filename'])
         self.files = set(files)
 

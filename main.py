@@ -61,6 +61,7 @@ def packages_get():
 
 
 @app.route("/packages/<package>", methods=['GET'])
+@app.route("/packages/<package>/", methods=['GET'])
 @basic_auth()
 def packages_get_package(package):
 	index = PackageIndex(get_storage(), package)
@@ -70,7 +71,7 @@ def packages_get_package(package):
 
 
 @app.route("/packages/<package>/<version>", methods=['GET'])
-@app.route("/pypi/package/<package>/<version>", methods=['GET'])
+@app.route("/packages/<package>/<version>/", methods=['GET'])
 @basic_auth()
 def get(package, version):
 	package = Package(get_storage(), package, version)
@@ -90,7 +91,7 @@ def package_download(name, version, filename):
 		abort(404)
 
 
-@app.route("/pypi/package/<path:package>", methods=['GET'])
+@app.route("/pypi/<path:package>", methods=['GET'])
 @basic_auth()
 def pypi_package_get(package):
 	st = get_storage()
