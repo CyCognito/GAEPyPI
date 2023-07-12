@@ -17,6 +17,8 @@
 import json
 import hashlib
 import functools
+import time
+
 from flask import Flask, Response, request
 
 
@@ -56,6 +58,7 @@ def basic_auth(required_roles=None):
 			if not auth or not auth.username or not auth.password:
 				return Response('Login!', 401, {'WWW-Authenticate': 'Basic realm="Secure Area"'})
 			if not valid_credentials(auth.username, auth.password, required_roles):
+				time.sleep(2)
 				return Response('Forbidden', 403)
 			return f(*args, **kwargs)
 		return wrapped
