@@ -85,7 +85,7 @@ class Package(BucketObject):
         storage = self.enquire_storage(storage)
         path = storage.get_package_path(self.name, self.version, filename)
         gcs_file = storage.read(path)
-        return gcs_file
+        return gcs_file, storage.get_metadata(path)
 
     def put_file(self, filename, content, storage=None):
         if filename in self.files:

@@ -98,6 +98,13 @@ class Storage(Renderable):
         """
         pass
 
+    @abstractmethod
+    def get_metadata(self, path):
+        """
+        Return file metadata
+        """
+        pass
+
     def empty(self):
         """
         Verify if any packages are present in the storage
@@ -179,6 +186,12 @@ class GCStorage(Storage):
         bucket = storage_client.bucket(self.bucket)
         blob = bucket.blob(bucket_path)
         return blob.exists()
+
+    def get_metadata(self, path):
+        _, bucket_path = to_bucket_and_path(path)
+        bucket = storage_client.bucket(self.bucket)
+        blob = bucket.get_blob(bucket_path)
+        return blob
 
     def path_exists(self, path):
         _, bucket_path = to_bucket_and_path(path)

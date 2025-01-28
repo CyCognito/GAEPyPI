@@ -109,12 +109,14 @@ class TestPackage(unittest.TestCase):
         fobj.close = mock.Mock()
         storage.get_package_path = mock.Mock(return_value='/mybucket/packages/dummy/0.0.1/a.txt')
         storage.read = mock.Mock(return_value=fobj)
+        storage.get_metadata = mock.Mock(return_value=fobj)
 
-        with p.get_file('a.txt') as f:
-            pass
+        f,m = p.get_file('a.txt')
+        f.close()
 
         fobj.close.assert_called()
         storage.read.assert_called_with('/mybucket/packages/dummy/0.0.1/a.txt')
+        storage.get_metadata.assert_called_with('/mybucket/packages/dummy/0.0.1/a.txt')
         storage.get_package_path.assert_called_with('dummy', '0.0.1', 'a.txt')
 
     def test_putfile_exists(self):

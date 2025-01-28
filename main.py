@@ -88,13 +88,16 @@ def get(package, version):
 def package_download(name, version, filename):
     try:
         package = Package(get_storage(), name, version)
-        gcs_file = package.get_file(filename)
-        return send_file(gcs_file, mimetype='application/octet-stream', as_attachment=True, download_name=filename)
+        gcs_file, metadata = package.get_file(filename)
+        return send_file(gcs_file, mimetype='application/octet-stream',
+                         as_attachment=True, download_name=filename,
+                         etag=metadata.etag,last_modified=metadata.updated, conditional=True)
     except (NotFound, GAEPyPIError):
         abort(404)
 
 
 @app.route("/pypi/<path:package>", methods=['GET'])
+@app.route("/pypi/<path:package>/", methods=['GET'])
 @basic_auth()
 def pypi_package_get(package):
     st = get_storage()
